@@ -14,15 +14,21 @@ $rv
  
  
 # Set your email settings
-$From = <INSERT EMAIL ADDRESS HERE>
-$To = <INSERT EMAIL ADDRESS HERE>
+$From = "<INSERT EMAIL ADDRESS HERE>"
+$To = "<INSERT EMAIL ADDRESS HERE>"
 #$Cc = ""
 $Subject = $env:COMPUTERNAME + " has Rebooted"
 #My Email body contains custom properties that will differ from your system.
 $Body = "$env:COMPUTERNAME has rebooted at $($rv.Date) by $($rv.User) `r`nReason: $($rv.Reason) ($($rv.ReasonCode)) `r`nComment:$($rv.Comment) "
-$SMTPServer = <INSERT SMTP SERVER HERE>
-$SMTPPort = "25"
+$SMTPServer = "<INSERT SMTP SERVER HERE>"
+$SMTPPort = "25" # smtp port, usually 465 with SSL or 587 with TLS
+
+# Send the email with  SMTP Credentials
+$SMTPClient = New-Object Net.Mail.SmtpClient($SMTPServer, $SMTPPort) 
+$SMTPClient.EnableSsl = $true 
+$SMTPClient.Credentials = New-Object System.Net.NetworkCredential("<username>", "<password>"); 
+$SMTPMessage = New-Object System.Net.Mail.MailMessage($From,$To,$Subject,$Body)
+$SMTPClient.Send($SMTPMessage)
  
- 
-# Send the email!
-Send-MailMessage -From $From -to $To -Subject $Subject -Body $Body -SmtpServer $SMTPServer
+# Send the email without SMTP Credentials
+# Send-MailMessage -From $From -to $To -Subject $Subject -Body $Body -SmtpServer $SMTPServer
